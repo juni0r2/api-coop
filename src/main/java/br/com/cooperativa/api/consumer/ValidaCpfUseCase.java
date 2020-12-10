@@ -4,7 +4,10 @@ import br.com.cooperativa.api.model.dto.ValidaCpfDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Optional;
 
 @Component
 public class ValidaCpfUseCase {
@@ -14,9 +17,14 @@ public class ValidaCpfUseCase {
 
     public ValidaCpfDTO executa(String cpf) {
         RestTemplate restTemplate = new RestTemplate();
-        ValidaCpfDTO api = restTemplate.getForObject(URI+cpf, ValidaCpfDTO.class);
-        log.info(api.toString());
-        return api;
+        try {
+            ValidaCpfDTO api = restTemplate.getForObject(URI+cpf, ValidaCpfDTO.class);
+            log.info(api.toString());
+            return api;
+        } catch (HttpClientErrorException e) {
+            log.error("O serviço não respondeu corretamente. Status: " +e.toString());
+            return null;
+        }
 
     }
 }
