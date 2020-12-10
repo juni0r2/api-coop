@@ -1,5 +1,5 @@
 # api-coop
-api para cooperativa teste
+Api para cooperativa
 
 # Api de votação de pauta de associados
 
