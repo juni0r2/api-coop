@@ -8,12 +8,17 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import java.util.Date;
 import java.util.List;
 
 @NoArgsConstructor
@@ -32,10 +37,21 @@ public class Pauta {
     @Column(name = "PA_NOME")
     private String nome;
 
+    @Column(name = "PA_DATA_ABERTURA")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataAbertura = new Date();
+
+    @Column(name = "PA_DATA_FECHAMENTO")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataFechamento;
+
+    @Enumerated(EnumType.STRING)
+    private EnumSituacaoPauta situacao = EnumSituacaoPauta.ABERTA;
+
     @OneToMany(mappedBy = "pauta")
     private List<Associado> associados;
 
-    @Transient
+    @OneToMany
     private List<Voto> votos;
 
     public PautaDTO converte() {
@@ -43,6 +59,9 @@ public class Pauta {
                 .id(this.id)
                 .nome(this.nome)
                 .associados(this.associados)
+                .dataAbertura(this.dataAbertura)
+                .dataFechamento(this.dataFechamento)
+                .situacaoPauta(this.situacao)
                 .build();
     }
 }

@@ -1,13 +1,13 @@
 package br.com.cooperativa.api;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class ApiCoopApplicationTests {
 
     @Test
-    void contextLoads() {
+    void contextLoads() throws Exception{
     }
 
 }

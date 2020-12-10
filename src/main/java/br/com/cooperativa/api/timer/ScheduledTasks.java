@@ -1,5 +1,7 @@
 package br.com.cooperativa.api.timer;
 
+import br.com.cooperativa.api.model.EnumSituacaoPauta;
+import br.com.cooperativa.api.repository.PautaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,9 +14,9 @@ import java.util.Date;
 public class ScheduledTasks {
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+    PautaRepository pautaRepository;
 
     public void aberturaDePauta() {
-        log.info("The time is now {}", dateFormat.format(new Date()));
+            this.pautaRepository.findBySituacao(EnumSituacaoPauta.ABERTA);
     }
 }
