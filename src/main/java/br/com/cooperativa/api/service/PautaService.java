@@ -5,8 +5,10 @@ import br.com.cooperativa.api.consumer.ValidaCpfUseCase;
 import br.com.cooperativa.api.excetions.AssociadoNaoExistente;
 import br.com.cooperativa.api.excetions.AssociadoNaoHabilitadoParaVotarException;
 import br.com.cooperativa.api.model.Associado;
+import br.com.cooperativa.api.model.EnumSituacaoPauta;
 import br.com.cooperativa.api.model.Pauta;
 import br.com.cooperativa.api.model.Voto;
+import br.com.cooperativa.api.model.dto.PautaDTO;
 import br.com.cooperativa.api.model.dto.ResultadoVotacaoDTO;
 import br.com.cooperativa.api.model.dto.ValidaCpfDTO;
 import br.com.cooperativa.api.model.dto.VotoDTO;
@@ -87,6 +89,18 @@ public class PautaService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public PautaDTO fecharPauta(Long idPauta) {
+        Optional<Pauta> pautaOptional = this.pautaRepository.findById(idPauta);
+
+        if (pautaOptional.isPresent()) {
+            Pauta pauta = pautaOptional.get();
+            pauta.setSituacao(EnumSituacaoPauta.FECHADA);
+            pauta = this.pautaRepository.save(pauta);
+            return new PautaDTO(pauta);
+        }
+        return null;
     }
 
 }

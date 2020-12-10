@@ -88,9 +88,16 @@ public class PautaController {
 
     @GetMapping("/status-da-votacao/{id}")
     @ResponseBody
-    public ResponseEntity situacaoVotacao(@PathVariable("id") Long idPauta) {
+    public ResponseEntity verificarSituacaoDaVotacaoDaPauta(@PathVariable("id") Long idPauta) {
         ResultadoVotacaoDTO resultadoVotacaoDTO = pautaService.verificaSituacaoVotacao(idPauta);
         return ResponseEntity.ok(resultadoVotacaoDTO);
+    }
+
+    @GetMapping("/fechar-pauta/{id}")
+    @ResponseBody
+    public ResponseEntity fecharPauta(@PathVariable("id") Long idPauta) {
+        PautaDTO pautaDTO = this.pautaService.fecharPauta(idPauta);
+        return ResponseEntity.ok(pautaDTO);
     }
 
 }
