@@ -10,6 +10,7 @@ import br.com.cooperativa.api.repository.AssociadoRepository;
 import br.com.cooperativa.api.repository.PautaRepository;
 import br.com.cooperativa.api.service.CpfService;
 import br.com.cooperativa.api.service.PautaService;
+import org.apache.commons.collections4.IterableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 public class ScheduledTasks {
@@ -40,7 +45,19 @@ public class ScheduledTasks {
     @Scheduled(fixedRate = 5000)
     public void aberturaDePauta() {
 
-        Optional<Pauta> optionalPauta = this.pautaRepository.findById(1l);
+        Iterable<Associado> all = this.associadoRepository.findAll();
+
+        if (quantidadeAssociados(all) < 50) {
+            getGerarAssociado();
+            gerarVotoAutomaticamente(all);
+        } else {
+            gerarVotoAutomaticamente(all);
+        }
+    }
+
+    private void gerarVotoAutomaticamente(Iterable<Associado> all) {
+
+        Optional<Pauta> optionalPauta = this.pautaRepository.findBySituacao(EnumSituacaoPauta.ABERTA);
 
         if (optionalPauta.isPresent()) {
             Pauta pauta = optionalPauta.get();
@@ -49,9 +66,12 @@ public class ScheduledTasks {
                 pauta.setSituacao(EnumSituacaoPauta.FECHADA);
                 this.pautaRepository.save(pauta);
             } else {
-                Associado associado = this.associadoRepository.save(getGerarAssociado());
-                String resultado = GerarResultadoSimOuNaoAleatorio();
-                pautaService.confirmarVoto(new VotoForm(associado.getCpf(), resultado, 1l));
+                List<Associado> associados = listaAssiciados(all);
+                for (Associado associado : associados) {
+                    associado = this.associadoRepository.save(associado);
+                    String resultado = GerarResultadoSimOuNaoAleatorio();
+                    this.pautaService.confirmarVoto(new VotoForm(associado.getCpf(), resultado, pauta.getId()));
+                }
             }
         }
     }
@@ -82,5 +102,14 @@ public class ScheduledTasks {
             return Boolean.TRUE;
         else
             return Boolean.FALSE;
+    }
+
+    private int quantidadeAssociados(Iterable<Associado> all) {
+        return IterableUtils.size(all);
+    }
+
+    private List<Associado> listaAssiciados(Iterable<Associado> all) {
+        return StreamSupport.stream(all.spliterator(), false)
+                        .collect(Collectors.toList());
     }
 }

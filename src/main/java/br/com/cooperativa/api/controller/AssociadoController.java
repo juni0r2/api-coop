@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -27,6 +30,24 @@ public class AssociadoController {
 
     @Autowired
     AssociadoRepository associadoRepository;
+
+    @GetMapping
+    @ResponseBody
+    public ResponseEntity<List<AssociadoDTO>> listarAssoiados() {
+        Iterable<Associado> all = this.associadoRepository.findAll();
+        if (all != null) {
+            Iterator<Associado> iterator = all.iterator();
+
+            List<AssociadoDTO> lista = new ArrayList<>();
+            while (iterator.hasNext()) {
+                Associado next = iterator.next();
+                lista.add(next.converte());
+            }
+            return ResponseEntity.ok(lista);
+        }
+        else
+            return ResponseEntity.notFound().build();
+    }
 
     @GetMapping("/{id}")
     @ResponseBody

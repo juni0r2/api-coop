@@ -5,10 +5,8 @@ import br.com.cooperativa.api.consumer.ValidaCpfUseCase;
 import br.com.cooperativa.api.excetions.AssociadoNaoExistente;
 import br.com.cooperativa.api.excetions.AssociadoNaoHabilitadoParaVotarException;
 import br.com.cooperativa.api.model.Associado;
-import br.com.cooperativa.api.model.EnumSituacaoPauta;
 import br.com.cooperativa.api.model.Pauta;
 import br.com.cooperativa.api.model.Voto;
-import br.com.cooperativa.api.model.dto.PautaDTO;
 import br.com.cooperativa.api.model.dto.ResultadoVotacaoDTO;
 import br.com.cooperativa.api.model.dto.ValidaCpfDTO;
 import br.com.cooperativa.api.model.dto.VotoDTO;
@@ -16,7 +14,6 @@ import br.com.cooperativa.api.model.form.VotoForm;
 import br.com.cooperativa.api.repository.AssociadoRepository;
 import br.com.cooperativa.api.repository.PautaRepository;
 import br.com.cooperativa.api.repository.VotoRepository;
-import br.com.cooperativa.api.timer.ScheduledTasks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +26,6 @@ import java.util.stream.Collectors;
 public class PautaService {
 
     private static final Logger log = LoggerFactory.getLogger(PautaService.class);
-
-    @Autowired
-    GeradorCpfUseCase geradorCpfUseCase;
 
     @Autowired
     ValidaCpfUseCase validaCpfUseCase;
