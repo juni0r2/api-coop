@@ -16,7 +16,6 @@ public class GeradorCpfUseCase {
     public GeradorCpfDTO executa() {
         RestTemplate restTemplate = new RestTemplate();
         GeradorCpfDTO api = restTemplate.getForObject(URI+TOKEN, GeradorCpfDTO.class);
-        log.info(api.toString());
         return api;
     }
 }

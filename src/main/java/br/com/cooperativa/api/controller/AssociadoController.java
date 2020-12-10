@@ -33,7 +33,7 @@ public class AssociadoController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<AssociadoDTO>> listarAssoiados() {
+    public ResponseEntity<List<AssociadoDTO>> listarAssociados() {
         Iterable<Associado> all = this.associadoRepository.findAll();
         if (all != null) {
             Iterator<Associado> iterator = all.iterator();

@@ -19,7 +19,6 @@ public class ValidaCpfUseCase {
         RestTemplate restTemplate = new RestTemplate();
         try {
             ValidaCpfDTO api = restTemplate.getForObject(URI+cpf, ValidaCpfDTO.class);
-            log.info(api.toString());
             return api;
         } catch (HttpClientErrorException e) {
             log.error("O serviço não respondeu corretamente. Status: " +e.toString());

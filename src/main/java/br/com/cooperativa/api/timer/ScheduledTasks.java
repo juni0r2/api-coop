@@ -80,6 +80,7 @@ public class ScheduledTasks {
         GeradorCpfDTO geradorCpfDTO = cpfService.gerarCpf();
         Associado associado = new Associado();
         associado.setCpf(geradorCpfDTO.getData().getNumber());
+        associado = this.associadoRepository.save(associado);
         return associado;
     }
 
