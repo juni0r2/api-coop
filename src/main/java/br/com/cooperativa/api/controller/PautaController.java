@@ -1,15 +1,14 @@
 package br.com.cooperativa.api.controller;
 
-import br.com.cooperativa.api.consumer.GeradorCpfUseCase;
-import br.com.cooperativa.api.consumer.ValidaCpfUseCase;
 import br.com.cooperativa.api.model.Pauta;
-import br.com.cooperativa.api.model.dto.GeradorCpfDTO;
 import br.com.cooperativa.api.model.dto.PautaDTO;
-import br.com.cooperativa.api.model.dto.ValidaCpfDTO;
+import br.com.cooperativa.api.model.dto.ResultadoVotacaoDTO;
+import br.com.cooperativa.api.model.dto.VotoDTO;
 import br.com.cooperativa.api.model.form.PautaForm;
+import br.com.cooperativa.api.model.form.VotoForm;
 import br.com.cooperativa.api.repository.PautaRepository;
+import br.com.cooperativa.api.service.PautaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -28,20 +30,37 @@ import java.util.Optional;
 public class PautaController {
 
     @Autowired
-    GeradorCpfUseCase consumer;
-    
-    @Autowired
-    ValidaCpfUseCase cpfUseCase;
+    PautaRepository pautaRepository;
 
     @Autowired
-    PautaRepository pautaRepository;
+    PautaService pautaService;
+
+    @GetMapping
+    @ResponseBody
+    public ResponseEntity<List<PautaDTO>> listarPautas() {
+        Iterable<Pauta> all = this.pautaRepository.findAll();
+        if (all != null) {
+            Iterator<Pauta> iterator = all.iterator();
+
+            List<PautaDTO> lista = new ArrayList<>();
+            while (iterator.hasNext()) {
+                Pauta next = iterator.next();
+                lista.add(next.converte());
+            }
+            return ResponseEntity.ok(lista);
+        }
+        else
+            return ResponseEntity.notFound().build();
+    }
 
     @GetMapping("/{id}")
     @ResponseBody
     public ResponseEntity<PautaDTO> buscarPauta(@PathVariable("id") Long id) {
-        Optional<Pauta> byId = this.pautaRepository.findById(id);
-        if (byId.isPresent())
-            return ResponseEntity.ok(byId.get().converte());
+        Optional<Pauta> pautaOptional = this.pautaRepository.findById(id);
+        if (pautaOptional.isPresent()) {
+            PautaDTO pautaDTO = pautaOptional.get().converte();
+            return ResponseEntity.ok(pautaDTO);
+        }
         else
             return ResponseEntity.notFound().build();
     }
@@ -55,24 +74,23 @@ public class PautaController {
         return ResponseEntity.created(uri).body(new PautaDTO(save));
     }
 
-    @GetMapping("/")
-    @ResponseBody
-    public ResponseEntity gerarCpf() {
+    @PostMapping("/pauta/voto")
+    public ResponseEntity<VotoDTO> votar(@RequestBody VotoForm form, UriComponentsBuilder uriBuilder) {
+        VotoDTO votoDTO = this.pautaService.confirmarVoto(form);
 
-        GeradorCpfDTO cpfApi = consumer.executa();
-        ValidaCpfDTO validaCpfDTO = cpfUseCase.executa(cpfApi.getData().getNumber());
-        return ResponseEntity.ok(validaCpfDTO);
+        if (votoDTO != null) {
+            URI uri = uriBuilder.path("/pauta/voto/{id}").buildAndExpand(votoDTO.getId()).toUri();
+            return ResponseEntity.created(uri).body(votoDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-//    @GetMapping("/{cpf}")
-//    @ResponseBody
-//    public ResponseEntity verificaCpfValido(@PathVariable(name = "cpf") String cpf) {
-//
-//        ValidaCpfDTO validaCpfDTO = cpfUseCase.executa(cpf);
-//
-//        if (validaCpfDTO != null) {
-//            ResponseEntity.ok(validaCpfDTO);
-//        }
-//        return ResponseEntity.badRequest().build();
-//    }
+    @GetMapping("/status-da-votacao/{id}")
+    @ResponseBody
+    public ResponseEntity situacaoVotacao(@PathVariable("id") Long idPauta) {
+        ResultadoVotacaoDTO resultadoVotacaoDTO = pautaService.verificaSituacaoVotacao(idPauta);
+        return ResponseEntity.ok(resultadoVotacaoDTO);
+    }
+
 }

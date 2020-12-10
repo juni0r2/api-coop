@@ -1,6 +1,7 @@
 package br.com.cooperativa.api.model;
 
 import br.com.cooperativa.api.model.dto.PautaDTO;
+import br.com.cooperativa.api.model.dto.VotoDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,11 +14,13 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -48,20 +51,28 @@ public class Pauta {
     @Enumerated(EnumType.STRING)
     private EnumSituacaoPauta situacao = EnumSituacaoPauta.ABERTA;
 
-    @OneToMany(mappedBy = "pauta")
+    @ManyToMany
     private List<Associado> associados;
 
-    @OneToMany
+    @OneToMany(mappedBy = "pauta")
     private List<Voto> votos;
 
     public PautaDTO converte() {
+
+        List<VotoDTO> votosDTO = new ArrayList<>();
+
+        this.votos.forEach(voto -> {
+            VotoDTO converte = voto.converte();
+            votosDTO.add(converte);
+        });
+
         return PautaDTO.builder()
                 .id(this.id)
                 .nome(this.nome)
-                .associados(this.associados)
                 .dataAbertura(this.dataAbertura)
                 .dataFechamento(this.dataFechamento)
                 .situacaoPauta(this.situacao)
+                .votos(votosDTO)
                 .build();
     }
 }

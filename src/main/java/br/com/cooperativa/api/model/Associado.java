@@ -13,8 +13,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.List;
 
 @Builder
 @NoArgsConstructor
@@ -29,12 +31,8 @@ public class Associado {
     @Column(name = "CO_CPF")
     private String cpf;
 
-    @Column(name = "CO_VOTO")
-    private String voto;
-
-    @ManyToOne
-    @JoinColumn(name = "CO_PAUTA_ID")
-    private Pauta pauta;
+    @ManyToMany
+    private List<Pauta> pautas;
 
     public AssociadoDTO converte() {
         return AssociadoDTO.builder()

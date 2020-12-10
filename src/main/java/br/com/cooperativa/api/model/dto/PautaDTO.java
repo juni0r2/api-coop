@@ -3,11 +3,13 @@ package br.com.cooperativa.api.model.dto;
 import br.com.cooperativa.api.model.Associado;
 import br.com.cooperativa.api.model.EnumSituacaoPauta;
 import br.com.cooperativa.api.model.Pauta;
+import br.com.cooperativa.api.model.Voto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +29,7 @@ public class PautaDTO {
 
     private EnumSituacaoPauta situacaoPauta;
 
-    private List<Associado> associados;
+    private List<VotoDTO> votos;
 
     public PautaDTO(Pauta pauta) {
         this.id = pauta.getId();
@@ -35,5 +37,13 @@ public class PautaDTO {
         this.dataAbertura = pauta.getDataAbertura();
         this.dataFechamento = pauta.getDataFechamento();
         this.situacaoPauta = pauta.getSituacao();
+
+        if (pauta.getVotos() != null && !pauta.getVotos().isEmpty()) {
+            ArrayList<VotoDTO> votoDTOS = new ArrayList<>();
+            for (Voto v : pauta.getVotos()) {
+                votoDTOS.add(new VotoDTO(v));
+            }
+            this.votos = votoDTOS;
+        }
     }
 }
